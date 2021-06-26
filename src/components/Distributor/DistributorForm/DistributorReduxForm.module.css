@@ -1,0 +1,88 @@
+.distributor__reduxForm {
+  background-color: #fff;
+  box-sizing: border-box;
+  text-align: center;
+  box-shadow: 0 3px 40px rgb(0 0 0 / 10%);
+  border-radius: 25px;
+  color: #427f94;
+}
+
+.reduxForm__recipientList {
+  border-color: #427f94;
+  width: 30%;
+  height: 300px;
+  border-radius: 10px;
+  border-width: 2px;
+}
+
+.reduxForm__recipientList:focus {
+  border-color: #ef476f;
+  width: 30%;
+  height: 300px;
+  border-radius: 10px;
+  border-width: 2px;
+  outline: none;
+}
+
+.reduxForm__quantityNft {
+  border-color: #427f94;
+  border-width: 2px;
+  border-radius: 5px;
+  border-style: solid;
+}
+
+.reduxForm__quantityNft:focus {
+  border-color: #ef476f;
+  border-radius: 5px;
+  border-width: 2px;
+  border-style: solid;
+  outline: none;
+}
+
+.reduxForm__templateId {
+  border-color: #427f94;
+  border-width: 2px;
+  border-radius: 5px;
+  border-style: solid;
+}
+
+.reduxForm__templateId:focus {
+  border-color: #ef476f;
+  border-width: 2px;
+  border-radius: 5px;
+  border-style: solid;
+  outline: none;
+}
+
+.reduxForm__sendButton {
+  text-decoration: none;
+  display: inline-block;
+  padding: 12px 40px;
+  margin: 10px 20px;
+  border-radius: 30px;
+  background-image: linear-gradient(
+    45deg,
+    #6ab1d7 0%,
+    #427f94 50%,
+    #073b4c 100%
+  );
+  background-position: 100% 0;
+  background-size: 200% 200%;
+  font-family: "Montserrat", sans-serif;
+  font-size: 24px;
+  font-weight: bold;
+  color: white;
+  box-shadow: 0 10px 10px 0 rgba(0, 40, 120, 0.35);
+  transition: 0.5s;
+  cursor: pointer;
+}
+.reduxForm__sendButton:hover {
+  box-shadow: 0 0 0 0 rgba(0, 40, 120, 0);
+  background-position: 0 0;
+  cursor: pointer;
+}
+
+.reduxForm__quantityAllNft {
+  color: #ef476f;
+  cursor: pointer;
+}

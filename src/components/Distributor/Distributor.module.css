@@ -1,0 +1,11 @@
+.distributor {
+    grid-area: c;
+    background-color: #fff;
+    padding: 20px;
+    font: 16pt "Montserrat";
+    font-weight: bold;
+}
+
+.distributor__preloader {
+    text-align: center;
+}
