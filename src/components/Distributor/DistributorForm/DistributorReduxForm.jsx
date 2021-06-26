@@ -5,6 +5,7 @@ import {
   Input,
   Textarea,
 } from "../../Common/FormControls/FormControls";
+import { required } from "../../../utils/validators/validators";
 import drfm from "./DistributorReduxForm.module.css";
 
 const DistributorForm = ({ handleSubmit, generalDataNFT, quantityNFT }) => {
@@ -16,7 +17,11 @@ const DistributorForm = ({ handleSubmit, generalDataNFT, quantityNFT }) => {
           <div className={drfm.reduxForm__quantityAllNft}>{quantityNFT}</div>
           <b>NFT FOR DISTRIBUTION:</b>
           <div>
-            <Field name="templateId" component="select" className={drfm.reduxForm__templateId}>
+            <Field
+              name="templateId"
+              component="select"
+              className={drfm.reduxForm__templateId}
+            >
               <option>Select NFT...</option>
               {generalDataNFT.map((gdNFT, index) => {
                 return (
@@ -32,7 +37,7 @@ const DistributorForm = ({ handleSubmit, generalDataNFT, quantityNFT }) => {
             "quantityNft",
             "write quantity NFT",
             Input,
-            [],
+            [required],
             { type: "number" },
             "",
             1,
@@ -44,16 +49,14 @@ const DistributorForm = ({ handleSubmit, generalDataNFT, quantityNFT }) => {
               "recipientList",
               "write new recipient: \nJoJo1.wam \nJoJo2.wam \n... \nJoJoN.wam",
               Textarea,
-              [],
+              [required],
               {},
               "",
               2,
               drfm.reduxForm__recipientList
             )}
           </div>
-          <button className={drfm.reduxForm__sendButton}>
-            SEND
-          </button>
+          <button className={drfm.reduxForm__sendButton}>SEND</button>
         </div>
       </form>
     </div>

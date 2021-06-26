@@ -3,15 +3,15 @@
 
 .formControl.error input,
 .formControl.error textarea {
-  border: solid darkblue 2px;
+  border: solid #ff2800 2px;
 }
 
 .formControl.error span {
-  color: darkblue;
+  color: #ff2800;
 }
 
 .formSummaryError {
-  border: solid red 1px;
+  border: solid #ff2800 1px;
   padding: 5px;
-  color: rgb(251, 31, 31)
+  color: #ff2800
 }

@@ -1,15 +1,16 @@
 import { waxAPI } from "../api/apiWAX";
 
 const SET_NFT = "nft-distributor/nft-reducer/SET_NFT";
-const SET_RECIPIENT = "nft-distributor/recipient/SET_RECIPIENT";
 const SET_RESPONSE_TRANSACTION = "nft-distributor/recipient/SET_RESPONSE_TRANSACTION";
+const SET_ERROR_MESSAGE = "nft-distributor/recipient/SET_ERROR_MESSAGE";
 
 let initialState = {
     generalDataNFT: [],
     recipientData: [],
     quantityNFT: 0,
     responseTransaction: "",
-    dataUpdateDone: false
+    dataUpdateDone: false,
+    errorMessage: ""
 };
 
 let distributorReducer = (state = initialState, action) => {
@@ -21,12 +22,16 @@ let distributorReducer = (state = initialState, action) => {
                 generalDataNFT: action.currentNFTOnWallet,
                 dataUpdateDone: action.dataUpdateDone
             };
-        case SET_RECIPIENT:
-            return {};
         case SET_RESPONSE_TRANSACTION:
             return {
+                ...state,
                 responseTransaction: action.response,
                 dataUpdateDone: action.dataUpdateDone
+            };
+        case SET_ERROR_MESSAGE:
+            return {
+                ...state,
+                errorMessage: action.currentErrorMessage
             };
         default:
             return state;
@@ -36,51 +41,55 @@ let distributorReducer = (state = initialState, action) => {
 //*ActionCreator
 export const setNFT = (currentNFTOnWallet, quantityNFT, dataUpdateDone) => ({ type: SET_NFT, currentNFTOnWallet, quantityNFT, dataUpdateDone });
 export const setResponseTransaction = (response, dataUpdateDone) => ({ type: SET_RESPONSE_TRANSACTION, response, dataUpdateDone });
-
+export const setErrorMessage = (currentErrorMessage) => ({ type: SET_ERROR_MESSAGE, currentErrorMessage });
 //*ThunkCreator
 export const getNFTFromWallet = () => async (dispatch) => {
     try {
         const response = await waxAPI.getAllNFT();
-        if (response.length > 0) {
-            let resultNFT = [];
-            let quantityNFT = 0;
+        if (response.errorMessage === undefined) {
             if (response.length > 0) {
-                const typesNFT = findTypeNFT(response);
+                let resultNFT = [];
+                let quantityNFT = 0;
+                if (response.length > 0) {
+                    const typesNFT = findTypeNFT(response);
 
-                const typesNFTDetails = await waxAPI.getDetailsDataTemplateNFT(typesNFT)
+                    const typesNFTDetails = await waxAPI.getDetailsDataTemplateNFT(typesNFT);
 
-                quantityNFT = response.length;
+                    quantityNFT = response.length;
 
-                for (let i = 0; i < typesNFT.length; i++) {
-                    resultNFT.push({
-                        template_id: typesNFT[i].template_id,
-                        template_name: typesNFTDetails[i].name !== undefined && typesNFTDetails[i].name !== null ? typesNFTDetails[i].name : "NO NAME",
-                        collection_name: typesNFT[i].collection_name,
-                        schema_name: typesNFT[i].schema_name,
-                        NFT: [],
-                    });
-                    for (let j = 0; j < response.length;) {
-                        if (
-                            response[j].collection_name === typesNFT[i].collection_name &&
-                            response[j].schema_name === typesNFT[i].schema_name &&
-                            response[j].template_id === typesNFT[i].template_id
-                        ) {
-                            resultNFT[i].NFT.push({
-                                asset_id: response[j].asset_id,
-                            });
-                            response.splice(j, 1)
-                        }
-                        else {
-                            j++
+                    for (let i = 0; i < typesNFT.length; i++) {
+                        resultNFT.push({
+                            template_id: typesNFT[i].template_id,
+                            template_name: typesNFTDetails[i].name !== undefined && typesNFTDetails[i].name !== null ? typesNFTDetails[i].name : "NO NAME",
+                            collection_name: typesNFT[i].collection_name,
+                            schema_name: typesNFT[i].schema_name,
+                            NFT: [],
+                        });
+                        for (let j = 0; j < response.length;) {
+                            if (
+                                response[j].collection_name === typesNFT[i].collection_name &&
+                                response[j].schema_name === typesNFT[i].schema_name &&
+                                response[j].template_id === typesNFT[i].template_id
+                            ) {
+                                resultNFT[i].NFT.push({
+                                    asset_id: response[j].asset_id,
+                                });
+                                response.splice(j, 1)
+                            }
+                            else {
+                                j++
+                            }
                         }
                     }
                 }
+                dispatch(setNFT(resultNFT, quantityNFT, true));
             }
-            dispatch(setNFT(resultNFT, quantityNFT, true));
+            dispatch(setErrorMessage(response.message))
         }
-    } catch (e) { console.log(e.message) }
+    } catch (e) { dispatch(setErrorMessage(e.message)); }
 };
 export const sendTransaction = (recipientList, templateId, quantityNft, generalDataNFT) => async (dispatch) => {
+    dispatch(setErrorMessage(""));
     if (
         recipientList !== undefined &&
         templateId !== undefined &&
@@ -118,31 +127,33 @@ export const sendTransaction = (recipientList, templateId, quantityNft, generalD
             });
 
             const response = await waxAPI.sendAirDropTransaction(transactionData);
-            if (response !== "") {
+            if (response.errorMessage === undefined) {
                 dispatch(setResponseTransaction(response, false));
+            } else {
+                dispatch(setErrorMessage(response.errorMessage));
             }
         }
         else {
-            console.log("Number of NFT is too large")
+            dispatch(setErrorMessage("Number of NFT is too large"));
         }
     } else {
-        console.log(
-            recipientList === undefined
-                ? "check recipient list (undefined)"
-                : templateId === undefined
-                    ? "check NFT for distribution (undefined)"
-                    : quantityNft === undefined
-                        ? "check quantity NFT (undefined)"
-                        : quantityNft <= 0
-                            ? "check quantity NFT <= 0"
-                            : recipientList === ""
-                                ? "empty data recipient list"
-                                : templateId === "Select NFT..."
-                                    ? "empty data NFT for distribution"
-                                    : quantityNft === ""
-                                        ? "empty data quantity NFT"
-                                        : "unknown error"
-        );
+        let errorMessage = "";
+        recipientList === undefined
+            ? errorMessage = "check recipient list (undefined)"
+            : templateId === undefined
+                ? errorMessage = "check NFT for distribution (undefined)"
+                : quantityNft === undefined
+                    ? errorMessage = "check quantity NFT (undefined)"
+                    : quantityNft <= 0
+                        ? errorMessage = "check quantity NFT <= 0"
+                        : recipientList === ""
+                            ? errorMessage = "empty data recipient list"
+                            : templateId === "Select NFT..."
+                                ? errorMessage = "empty data NFT for distribution"
+                                : quantityNft === ""
+                                    ? errorMessage = "empty data quantity NFT"
+                                    : errorMessage = "unknown error, call operator"
+        dispatch(setErrorMessage(errorMessage));
     }
 }
 

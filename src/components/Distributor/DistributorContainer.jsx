@@ -8,6 +8,7 @@ import {
   getAllQuantityNFT,
   getResponseTransaction,
   getDataUpdateDone,
+  getErrorMessage,
 } from "../../redux/distributor-selectors";
 import {
   getNFTFromWallet,
@@ -33,6 +34,7 @@ class DistributorContainer extends React.Component {
           sendTransaction={this.props.sendTransaction}
           quantityNFT={this.props.quantityNFT}
           dataUpdateDone={this.props.dataUpdateDone}
+          errorMessage={this.props.errorMessage}
         />
       </>
     );
@@ -46,6 +48,7 @@ const mapStateToProps = (state) => {
     recipient: getRecipient(state),
     responseTransaction: getResponseTransaction(state),
     dataUpdateDone: getDataUpdateDone(state),
+    errorMessage: getErrorMessage(state)
   };
 };
 

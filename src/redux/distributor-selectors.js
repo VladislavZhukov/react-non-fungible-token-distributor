@@ -8,3 +8,5 @@ export const getResponseTransaction = (state) => { return state.distributor.resp
 
 export const getDataUpdateDone = (state) => { return state.distributor.dataUpdateDone }
 
+export const getErrorMessage = (state) => { return state.distributor.errorMessage }
+

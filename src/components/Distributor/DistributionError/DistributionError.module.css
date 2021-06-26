@@ -1,0 +1,9 @@
+.distributor__errorMessage {
+    background-color: #fff;
+    box-sizing: border-box;
+    text-align: center;
+    box-shadow: 0 3px 40px rgb(0 0 0 / 10%);
+    border-radius: 25px;
+    margin-top: 2%;
+    color: #ff2800;
+  }

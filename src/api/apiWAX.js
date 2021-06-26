@@ -42,11 +42,10 @@ export const waxAPI = {
                     show_payer: false,
                 })
                 portionNFT.rows.map(element => allNFT.push(element));
-
             }
 
             return allNFT;
-        } catch (e) { console.log(e.message) }
+        } catch (e) { return { errorMessage: e.message } }
     },
     //*** Method returns template details
     //* Method needs an array of objects
@@ -94,8 +93,6 @@ export const waxAPI = {
             });
 
             return result;
-        } catch (e) {
-            console.log(e.message)
-        }
+        } catch (e) { return { errorMessage: e.message }; }
     }
 }

@@ -3,6 +3,7 @@ import "react-dropdown/style.css";
 import DistributorReduxForm from "./DistributorForm/DistributorReduxForm";
 import dm from "./Distributor.module.css";
 import Preloader from "../Common/Preloader/Preloader";
+import DistributionError from "./DistributionError/DistributionError";
 
 const Distributor = (props) => {
   const onSubmit = (formData) => {
@@ -27,6 +28,9 @@ const Distributor = (props) => {
         <div className={dm.distributor__preloader}>
           <Preloader />
         </div>
+      )}
+      {props.errorMessage === "" ? undefined : (
+        <DistributionError errorMessage={props.errorMessage} />
       )}
     </div>
   );
