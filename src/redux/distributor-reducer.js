@@ -3,6 +3,7 @@ import { waxAPI } from "../api/apiWAX";
 const SET_NFT = "nft-distributor/nft-reducer/SET_NFT";
 const SET_RESPONSE_TRANSACTION = "nft-distributor/recipient/SET_RESPONSE_TRANSACTION";
 const SET_ERROR_MESSAGE = "nft-distributor/recipient/SET_ERROR_MESSAGE";
+const SET_DATA_IN_PROCESS_UPDATE = "nft-distributor/recipient/SET_IN_PROCESS_UPDATE"
 
 let initialState = {
     generalDataNFT: [],
@@ -10,7 +11,8 @@ let initialState = {
     quantityNFT: 0,
     responseTransaction: "",
     dataUpdateDone: false,
-    errorMessage: ""
+    errorMessage: "",
+    dataInProcessUpdate: false
 };
 
 let distributorReducer = (state = initialState, action) => {
@@ -33,15 +35,22 @@ let distributorReducer = (state = initialState, action) => {
                 ...state,
                 errorMessage: action.currentErrorMessage
             };
+        case SET_DATA_IN_PROCESS_UPDATE:
+            return {
+                ...state,
+                dataInProcessUpdate: action.dataInProcessUpdate
+            }
         default:
             return state;
     }
 };
 
 //*ActionCreator
-export const setNFT = (currentNFTOnWallet, quantityNFT, dataUpdateDone) => ({ type: SET_NFT, currentNFTOnWallet, quantityNFT, dataUpdateDone });
-export const setResponseTransaction = (response, dataUpdateDone) => ({ type: SET_RESPONSE_TRANSACTION, response, dataUpdateDone });
-export const setErrorMessage = (currentErrorMessage) => ({ type: SET_ERROR_MESSAGE, currentErrorMessage });
+const setNFT = (currentNFTOnWallet, quantityNFT, dataUpdateDone) => ({ type: SET_NFT, currentNFTOnWallet, quantityNFT, dataUpdateDone });
+const setResponseTransaction = (response, dataUpdateDone) => ({ type: SET_RESPONSE_TRANSACTION, response, dataUpdateDone });
+const setErrorMessage = (currentErrorMessage) => ({ type: SET_ERROR_MESSAGE, currentErrorMessage });
+export const setDataInProcessUpdate = (dataInProcessUpdate) => ({ type: SET_DATA_IN_PROCESS_UPDATE, dataInProcessUpdate })
+
 //*ThunkCreator
 export const getNFTFromWallet = () => async (dispatch) => {
     try {

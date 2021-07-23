@@ -16,7 +16,7 @@ const Distributor = (props) => {
   };
   return (
     <div className={dm.distributor}>
-      {props.dataUpdateDone ? (
+      {props.dataUpdateDone && !props.dataInProcessUpdate ? (
         <div>
           <DistributorReduxForm
             onSubmit={onSubmit}

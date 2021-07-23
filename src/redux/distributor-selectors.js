@@ -10,3 +10,5 @@ export const getDataUpdateDone = (state) => { return state.distributor.dataUpdat
 
 export const getErrorMessage = (state) => { return state.distributor.errorMessage }
 
+export const getDataInProcessUpdate = (state) => { return state.distributor.dataInProcessUpdate }
+
