@@ -1,4 +1,5 @@
 import { waxAPI } from "../api/apiWAX";
+import { setErrorMessage } from "./distributor-reducer";
 
 const SET_USER_DATA = "nft-distributor/auth/SET_USER_DATA";
 
@@ -28,8 +29,10 @@ const setAuthUserData = (userAccount, pubKeys, isAuth) => ({
 //ThunkCreator
 export const getAuthUserData = () => async (dispatch) => {
     const response = await waxAPI.login();
-    if (response.userAccount !== undefined) {
+    if (response !== undefined) {
         dispatch(setAuthUserData(response.userAccount, response.pubKeys, true));
+    } else if (response === undefined) {
+        dispatch(setErrorMessage('wax wallet is buggy, push F5 button, maybe this will decide trouble'));
     }
 };
 

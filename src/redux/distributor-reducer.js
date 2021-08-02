@@ -48,7 +48,7 @@ let distributorReducer = (state = initialState, action) => {
 //*ActionCreator
 const setNFT = (currentNFTOnWallet, quantityNFT, dataUpdateDone) => ({ type: SET_NFT, currentNFTOnWallet, quantityNFT, dataUpdateDone });
 const setResponseTransaction = (response, dataUpdateDone) => ({ type: SET_RESPONSE_TRANSACTION, response, dataUpdateDone });
-const setErrorMessage = (currentErrorMessage) => ({ type: SET_ERROR_MESSAGE, currentErrorMessage });
+export const setErrorMessage = (currentErrorMessage) => ({ type: SET_ERROR_MESSAGE, currentErrorMessage });
 export const setDataInProcessUpdate = (dataInProcessUpdate) => ({ type: SET_DATA_IN_PROCESS_UPDATE, dataInProcessUpdate })
 
 //*ThunkCreator
@@ -83,7 +83,7 @@ export const getNFTFromWallet = () => async (dispatch) => {
                                 resultNFT[i].NFT.push({
                                     asset_id: response[j].asset_id,
                                 });
-                                response.splice(j, 1)
+                                response.splice(j, 1);
                             }
                             else {
                                 j++
@@ -93,7 +93,7 @@ export const getNFTFromWallet = () => async (dispatch) => {
                 }
                 dispatch(setNFT(resultNFT, quantityNFT, true));
             }
-            dispatch(setErrorMessage(response.message))
+            dispatch(setErrorMessage(response.message));
         }
     } catch (e) { dispatch(setErrorMessage(e.message)); }
 };

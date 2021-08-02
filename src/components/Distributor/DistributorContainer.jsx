@@ -21,7 +21,27 @@ class DistributorContainer extends React.Component {
   componentDidMount() {
     this.props.getNFTFromWallet();
   }
-  componentDidUpdate(prevProps, prevState, snapshot) {
+  componentDidUpdate(prevProps, prevState, snapshot) {    
+    let nftUpdated = true;
+    if (
+      this.props.dataInProcessUpdate &&
+      prevProps.generalDataNFT.length !== 0
+    ) {
+      if (
+        this.props.generalDataNFT.length === prevProps.generalDataNFT.length &&
+        this.props.quantityNFT === prevProps.quantityNFT
+      ) {
+        for (let j = 0; j < this.props.generalDataNFT.length; j++) {
+          if (
+            JSON.stringify(this.props.generalDataNFT[j].NFT.sort()) ===
+            JSON.stringify(prevProps.generalDataNFT[j].NFT.sort())
+          ) {
+            nftUpdated = false;
+            break;
+          }
+        }
+      }
+    }
     if (this.props.responseTransaction !== prevProps.responseTransaction) {
       setTimeout(
         (this.props.getNFTFromWallet, this.props.setDataInProcessUpdate(true)),
@@ -29,17 +49,14 @@ class DistributorContainer extends React.Component {
       );
     } else if (
       this.props.responseTransaction === prevProps.responseTransaction &&
-      this.props.quantityNFT === prevProps.quantityNFT &&
-      this.props.dataInProcessUpdate
+      this.props.dataInProcessUpdate &&
+      !nftUpdated
     ) {
-      setTimeout(
-        this.props.getNFTFromWallet,
-        3000
-      );
+      setTimeout(this.props.getNFTFromWallet, 3000);
     } else if (
       this.props.responseTransaction === prevProps.responseTransaction &&
-      this.props.quantityNFT !== prevProps.quantityNFT &&
-      this.props.dataInProcessUpdate
+      this.props.dataInProcessUpdate &&
+      nftUpdated
     ) {
       this.props.setDataInProcessUpdate(false);
     }
