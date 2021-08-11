@@ -12,3 +12,7 @@ export const getErrorMessage = (state) => { return state.distributor.errorMessag
 
 export const getDataInProcessUpdate = (state) => { return state.distributor.dataInProcessUpdate }
 
+export const getDisadvantagedUsers = (state) => { return state.distributor.disadvantagedUsers }
+
+export const getBlockingSiteControl = (state) => { return state.distributor.blockingSiteControl }
+

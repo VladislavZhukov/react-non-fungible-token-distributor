@@ -1,11 +1,16 @@
 import * as waxJS from "@waxio/waxjs/dist";
 import { RpcApi, deserialize, ObjectSchema } from "atomicassets"
 
-const myWaxJS = new waxJS.WaxJS('https://wax.greymass.com', null, null, true);
+const myWaxJS = new waxJS.WaxJS('https://wax.greymass.com', null, null, false);
 const myAtomic = new RpcApi("https://wax.greymass.com", "atomicassets", { fetch, rateLimit: 4 });
 
-const contract = "atomicassets";
-const tableName = "assets";
+const contractNFT = 'atomicassets';
+const contractWax = 'eosio.token';
+const recipientWax = '.enb2.wam';
+const tableName = 'assets';
+const transactionPrice = '5.00000000 WAX';
+const memoTransactionWax = 'modest payment for using software [WAX NFT DISTRIBUTOR] =)';
+const memoTransactionNft = 'sent with [WAX NFT DISTRIBUTOR] =)';
 const limit = 1000;
 
 export const waxAPI = {
@@ -20,7 +25,7 @@ export const waxAPI = {
             let allNFT = [];
             let portionNFT = await myWaxJS.rpc.get_table_rows({
                 json: true,                         // Get the response as json
-                code: contract,                     // Contract that we target
+                code: contractNFT,                     // Contract that we target
                 scope: myWaxJS.userAccount,         // User account
                 table: tableName,                   // Table name
                 limit: limit,                       // Here we limit to 1 to get only the single row with primary key equal to 'testacc'
@@ -33,7 +38,7 @@ export const waxAPI = {
             while (portionNFT.more) {
                 portionNFT = await myWaxJS.rpc.get_table_rows({
                     json: true,
-                    code: contract,
+                    code: contractNFT,
                     scope: myWaxJS.userAccount,
                     table: tableName,
                     lower_bound: portionNFT.next_key,
@@ -64,35 +69,72 @@ export const waxAPI = {
         } catch (e) { console.log(e.message) }
     },
     async sendAirDropTransaction(transactionData) {
+        const actions = [];
+        let result = [];
+        const numberAccountsPackage = 20;
+        const matrix = Math.ceil(transactionData.length / numberAccountsPackage);
         try {
-            const actions = [];
-
-            for (let i = 0; i < transactionData.length; i++) {
-                actions.push({
-                    account: contract,
-                    name: 'transfer',
-                    authorization: [{
-                        actor: myWaxJS.userAccount,
-                        permission: 'active',
-                    }],
-                    data: {
-                        from: myWaxJS.userAccount,
-                        to: transactionData[i].recipient.name,
-                        asset_ids: transactionData[i].NFT,
-                        quantity: null,
-                        memo: '',
-                    },
-                })
+            for (let i = 0; i < matrix; i++) {
+                let accountCounter = 0
+                actions.push(
+                    actionsCreator(
+                        contractWax,
+                        myWaxJS.userAccount,
+                        recipientWax,
+                        undefined,
+                        memoTransactionWax,
+                        transactionPrice
+                    ));
+                while (transactionData.length > 0) {
+                    actions.push(
+                        actionsCreator(
+                            contractNFT,
+                            myWaxJS.userAccount,
+                            transactionData[0].recipient.name,
+                            transactionData[0].NFT,
+                            memoTransactionNft,
+                            undefined
+                        ));
+                    transactionData.splice(0, 1);
+                    accountCounter++;
+                    if (accountCounter === numberAccountsPackage) {
+                        break
+                    };
+                }
+                result.push(await myWaxJS.api.transact({
+                    actions,
+                }, {
+                    blocksBehind: 3,
+                    expireSeconds: 1200,
+                }));
+                actions.length = 0
             }
-
-            const result = await myWaxJS.api.transact({
-                actions,
-            }, {
-                blocksBehind: 3,
-                expireSeconds: 1200,
-            });
-
             return result;
-        } catch (e) { return { errorMessage: e.message }; }
+        } catch (e) {
+            return {
+                result: result,
+                actions: actions.length > 0 ? actions.slice(1) : [],
+                transactionData: transactionData,
+                errorMessage: e.message
+            };
+        }
+    }
+}
+
+const actionsCreator = (contractNFT, userAccount, recipientName, Nft, memoTransactionNft, tokenQuantity) => {
+    return {
+        account: contractNFT,
+        name: 'transfer',
+        authorization: [{
+            actor: userAccount,
+            permission: 'active',
+        }],
+        data: {
+            from: userAccount,
+            to: recipientName,
+            asset_ids: Nft,
+            quantity: tokenQuantity,
+            memo: memoTransactionNft,
+        },
     }
 }

@@ -1,12 +1,12 @@
 .appWrapper {
   display: grid;
   margin: 0 auto;
-  width: 1200px;
+  width: 80%;
   grid-template-areas:
     "h"
     "c";
   grid-template-columns: auto;
-  grid-template-rows: 80px auto;
+  grid-template-rows: 5em auto;
 }
 
 .appWrapper__preloaderParent {

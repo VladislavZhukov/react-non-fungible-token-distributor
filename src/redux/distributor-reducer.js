@@ -3,16 +3,20 @@ import { waxAPI } from "../api/apiWAX";
 const SET_NFT = "nft-distributor/nft-reducer/SET_NFT";
 const SET_RESPONSE_TRANSACTION = "nft-distributor/recipient/SET_RESPONSE_TRANSACTION";
 const SET_ERROR_MESSAGE = "nft-distributor/recipient/SET_ERROR_MESSAGE";
-const SET_DATA_IN_PROCESS_UPDATE = "nft-distributor/recipient/SET_IN_PROCESS_UPDATE"
+const SET_DATA_IN_PROCESS_UPDATE = "nft-distributor/recipient/SET_IN_PROCESS_UPDATE";
+const SET_DISADVANTAGED_USERS = "nft-distributor/recipient/SET_DISADVANTAGED_USERS";
+const SET_BLOCKING_SITE_CONTROL = "nft-distributor/recipient/SET_BLOCKING_SITE_CONTROL"
 
 let initialState = {
     generalDataNFT: [],
     recipientData: [],
     quantityNFT: 0,
-    responseTransaction: "",
+    responseTransaction: [],
     dataUpdateDone: false,
     errorMessage: "",
-    dataInProcessUpdate: false
+    dataInProcessUpdate: false,
+    disadvantagedUsers: [],
+    blockingSiteControl: false
 };
 
 let distributorReducer = (state = initialState, action) => {
@@ -40,6 +44,16 @@ let distributorReducer = (state = initialState, action) => {
                 ...state,
                 dataInProcessUpdate: action.dataInProcessUpdate
             }
+        case SET_DISADVANTAGED_USERS:
+            return {
+                ...state,
+                disadvantagedUsers: action.disadvantagedUsers
+            }
+        case SET_BLOCKING_SITE_CONTROL:
+            return {
+                ...state,
+                blockingSiteControl: action.blockingSiteControl
+            }
         default:
             return state;
     }
@@ -48,8 +62,10 @@ let distributorReducer = (state = initialState, action) => {
 //*ActionCreator
 const setNFT = (currentNFTOnWallet, quantityNFT, dataUpdateDone) => ({ type: SET_NFT, currentNFTOnWallet, quantityNFT, dataUpdateDone });
 const setResponseTransaction = (response, dataUpdateDone) => ({ type: SET_RESPONSE_TRANSACTION, response, dataUpdateDone });
+const setDisadvantagedUsers = (disadvantagedUsers) => ({ type: SET_DISADVANTAGED_USERS, disadvantagedUsers });
+const setBlockingSiteControl = (blockingSiteControl) => ({ type: SET_BLOCKING_SITE_CONTROL, blockingSiteControl });
 export const setErrorMessage = (currentErrorMessage) => ({ type: SET_ERROR_MESSAGE, currentErrorMessage });
-export const setDataInProcessUpdate = (dataInProcessUpdate) => ({ type: SET_DATA_IN_PROCESS_UPDATE, dataInProcessUpdate })
+export const setDataInProcessUpdate = (dataInProcessUpdate) => ({ type: SET_DATA_IN_PROCESS_UPDATE, dataInProcessUpdate });
 
 //*ThunkCreator
 export const getNFTFromWallet = () => async (dispatch) => {
@@ -98,7 +114,6 @@ export const getNFTFromWallet = () => async (dispatch) => {
     } catch (e) { dispatch(setErrorMessage(e.message)); }
 };
 export const sendTransaction = (recipientList, templateId, quantityNft, generalDataNFT) => async (dispatch) => {
-    dispatch(setErrorMessage(""));
     if (
         recipientList !== undefined &&
         templateId !== undefined &&
@@ -108,6 +123,8 @@ export const sendTransaction = (recipientList, templateId, quantityNft, generalD
         templateId !== "Select NFT..." &&
         quantityNft !== ""
     ) {
+        dispatch(setErrorMessage(""));
+        dispatch(setDisadvantagedUsers([]));
         const allNftByTemplates = generalDataNFT.find(
             (nft) => nft.template_id.toString() === templateId
         );
@@ -135,11 +152,30 @@ export const sendTransaction = (recipientList, templateId, quantityNft, generalD
                 return { recipient: rl, NFT: nftForTransaction.slice(begin, end) };
             });
 
+            dispatch(setBlockingSiteControl(true));
+            //* Call method of sending transaction
             const response = await waxAPI.sendAirDropTransaction(transactionData);
+            dispatch(setBlockingSiteControl(false));
+
             if (response.errorMessage === undefined) {
                 dispatch(setResponseTransaction(response, false));
             } else {
                 dispatch(setErrorMessage(response.errorMessage));
+                let _disadvantagedUsersTemp = [];
+                if (response.actions && response.actions.length > 0) {
+                    for (let i = 0; i < response.actions.length; i++) {
+                        _disadvantagedUsersTemp.push(response.actions[i].data.to);
+                    }
+                }
+                if (response.transactionData && response.transactionData.length > 0) {
+                    for (let i = 0; i < response.transactionData.length; i++) {
+                        _disadvantagedUsersTemp.push(response.transactionData[i].recipient.name);
+                    }
+                }
+                dispatch(setDisadvantagedUsers(_disadvantagedUsersTemp));
+                if (response.result.length > 0) {
+                    dispatch(setResponseTransaction(response.result, false));
+                }
             }
         }
         else {

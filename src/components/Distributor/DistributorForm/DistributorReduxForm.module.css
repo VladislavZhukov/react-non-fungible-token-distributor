@@ -10,16 +10,17 @@
 .reduxForm__recipientList {
   border-color: #427f94;
   width: 30%;
-  height: 300px;
-  border-radius: 10px;
+  height: 20em;
+  border-radius: 3px;
   border-width: 2px;
+  white-space: pre-wrap;
 }
 
 .reduxForm__recipientList:focus {
   border-color: #ef476f;
   width: 30%;
   height: 300px;
-  border-radius: 10px;
+  border-radius: 3px;
   border-width: 2px;
   outline: none;
 }
@@ -84,5 +85,10 @@
 
 .reduxForm__quantityAllNft {
   color: #ef476f;
+  cursor: pointer;
+}
+
+.reduxForm__disadvantagedUsers {
+  color: #DDB321;
   cursor: pointer;
 }

@@ -5,10 +5,21 @@ import {
   Input,
   Textarea,
 } from "../../Common/FormControls/FormControls";
-import { required } from "../../../utils/validators/validators";
+import {
+  required,
+  maxLengthCreator,
+} from "../../../utils/validators/validators";
 import drfm from "./DistributorReduxForm.module.css";
+import { connect } from "react-redux";
 
-const DistributorForm = ({ handleSubmit, generalDataNFT, quantityNFT }) => {
+const maxLength400 = maxLengthCreator(400);
+
+let DistributorForm = ({
+  handleSubmit,
+  generalDataNFT,
+  quantityNFT,
+  disadvantagedUsers,
+}) => {
   return (
     <div className={drfm.distributor__reduxForm}>
       <form onSubmit={handleSubmit}>
@@ -37,7 +48,7 @@ const DistributorForm = ({ handleSubmit, generalDataNFT, quantityNFT }) => {
             "quantityNft",
             "write quantity NFT",
             Input,
-            [required],
+            [required, maxLength400],
             { type: "number" },
             "",
             1,
@@ -56,18 +67,30 @@ const DistributorForm = ({ handleSubmit, generalDataNFT, quantityNFT }) => {
               drfm.reduxForm__recipientList
             )}
           </div>
+          {disadvantagedUsers.length > 0 && (
+            <div className={drfm.reduxForm__disadvantagedUsers}>
+              Ohhh, noooo (^･o･^)ﾉ you have users who are missing NFT
+            </div>
+          )}
           <button className={drfm.reduxForm__sendButton}>SEND</button>
+          <div>sending one transaction costs 5.000000 WAX</div>
         </div>
       </form>
     </div>
   );
 };
 
-const DistributorReduxForm = reduxForm({
+let DistributorReduxForm = reduxForm({
   form: "distributor",
+})(DistributorForm);
+
+DistributorReduxForm = connect((state) => ({
   initialValues: {
+    recipientList: state.distributor.disadvantagedUsers
+      .map((v) => v + "\r\n")
+      .join(""),
     quantityNft: 1,
   },
-})(DistributorForm);
+}))(DistributorReduxForm);
 
 export default DistributorReduxForm;

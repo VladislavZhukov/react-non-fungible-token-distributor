@@ -16,12 +16,14 @@ const Distributor = (props) => {
   };
   return (
     <div className={dm.distributor}>
+      {props.blockingSiteControl && <div className={dm.distributor__blockControl}></div>}
       {props.dataUpdateDone && !props.dataInProcessUpdate ? (
         <div>
           <DistributorReduxForm
             onSubmit={onSubmit}
             generalDataNFT={props.generalDataNFT}
             quantityNFT={props.quantityNFT}
+            disadvantagedUsers={props.disadvantagedUsers}
           />
         </div>
       ) : (

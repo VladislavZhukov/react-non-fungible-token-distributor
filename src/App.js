@@ -1,15 +1,20 @@
+//Core
 import React from "react";
-import { withRouter } from "react-router";
 import am from './App.module.css';
-import { compose } from "redux";
-import { initializeApp } from "./redux/app-reducer";
+import { withRouter } from "react-router";
+import { BrowserRouter, Redirect, Route, Switch } from "react-router-dom";
 import { connect, Provider } from "react-redux";
-import { getInitialized } from "./redux/app-selectors";
-import { BrowserRouter } from "react-router-dom";
+import { compose } from "redux";
 import store from "./redux/store";
+//Reducer
+import { initializeApp } from "./redux/app-reducer";
+//Selector
+import { getInitialized } from "./redux/app-selectors";
+//Common
+import Preloader from "./components/Common/Preloader/Preloader";
+//Component
 import HeaderContainer from "./components/Header/HeaderContainer";
 import DistributorContainer from "./components/Distributor/DistributorContainer";
-import Preloader from "./components/Common/Preloader/Preloader";
 
 class App extends React.Component {
   componentDidMount() {
@@ -27,7 +32,11 @@ class App extends React.Component {
       <div className={am.appWrapper}>
         <HeaderContainer />
         <div>
-          <DistributorContainer />
+          <Switch>
+            <Route exact path="/" render={() => <Redirect to={"/distributor"} />} />
+            <Route path="/distributor" component={DistributorContainer} />
+            <Route path="*" render={() => <Redirect to={"/distributor"} />} />
+          </Switch>
         </div>
       </div>
     );

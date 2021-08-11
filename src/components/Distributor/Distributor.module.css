@@ -1,11 +1,20 @@
 .distributor {
-    grid-area: c;
-    background-color: #fff;
-    padding: 20px;
-    font: 16pt "Montserrat";
-    font-weight: bold;
+  grid-area: c;
+  background-color: #fff;
+  padding: 1%;
+  font-family: "Montserrat";
+  font-size: 16pt;
+  font-weight: bold;
 }
 
 .distributor__preloader {
-    text-align: center;
+  text-align: center;
 }
+.distributor__blockControl {
+    position: fixed;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+  }

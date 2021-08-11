@@ -38,7 +38,7 @@ export const createField = (
   props = {},
   text = "",
   key = null,
-  className,
+  className
 ) => {
   return (
     <div key={key}>

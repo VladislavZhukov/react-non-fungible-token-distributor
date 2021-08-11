@@ -1,7 +1,10 @@
+//Core
 import React from "react";
-import { connect } from "react-redux";
 import { compose } from "redux";
+import { connect } from "react-redux";
+//Component
 import Distributor from "./Distributor";
+//Selectors
 import {
   getRecipient,
   getAllNFT,
@@ -10,7 +13,10 @@ import {
   getDataUpdateDone,
   getErrorMessage,
   getDataInProcessUpdate,
+  getDisadvantagedUsers,
+  getBlockingSiteControl,
 } from "../../redux/distributor-selectors";
+//Reducer
 import {
   getNFTFromWallet,
   sendTransaction,
@@ -21,7 +27,7 @@ class DistributorContainer extends React.Component {
   componentDidMount() {
     this.props.getNFTFromWallet();
   }
-  componentDidUpdate(prevProps, prevState, snapshot) {    
+  componentDidUpdate(prevProps) {
     let nftUpdated = true;
     if (
       this.props.dataInProcessUpdate &&
@@ -32,6 +38,7 @@ class DistributorContainer extends React.Component {
         this.props.quantityNFT === prevProps.quantityNFT
       ) {
         for (let j = 0; j < this.props.generalDataNFT.length; j++) {
+          debugger
           if (
             JSON.stringify(this.props.generalDataNFT[j].NFT.sort()) ===
             JSON.stringify(prevProps.generalDataNFT[j].NFT.sort())
@@ -42,12 +49,16 @@ class DistributorContainer extends React.Component {
         }
       }
     }
+    //* PAGE UPDATE DESCRIPTION
     if (this.props.responseTransaction !== prevProps.responseTransaction) {
+      //* Update page after receiving a response about a sent transaction
       setTimeout(
         (this.props.getNFTFromWallet, this.props.setDataInProcessUpdate(true)),
         3000
       );
     } else if (
+      //* Refreshes the page if the transaction was submitted 
+      //* and NFT data in user's inventory was received unchanged
       this.props.responseTransaction === prevProps.responseTransaction &&
       this.props.dataInProcessUpdate &&
       !nftUpdated
@@ -58,6 +69,7 @@ class DistributorContainer extends React.Component {
       this.props.dataInProcessUpdate &&
       nftUpdated
     ) {
+      //* sets DataInProcessUpdate flag to false
       this.props.setDataInProcessUpdate(false);
     }
   }
@@ -65,13 +77,15 @@ class DistributorContainer extends React.Component {
     return (
       <>
         <Distributor
-          generalDataNFT={this.props.generalDataNFT}
           recipient={this.props.recipient}
-          sendTransaction={this.props.sendTransaction}
           quantityNFT={this.props.quantityNFT}
-          dataUpdateDone={this.props.dataUpdateDone}
           errorMessage={this.props.errorMessage}
+          dataUpdateDone={this.props.dataUpdateDone}
+          generalDataNFT={this.props.generalDataNFT}
+          sendTransaction={this.props.sendTransaction}
+          disadvantagedUsers={this.props.disadvantagedUsers}
           dataInProcessUpdate={this.props.dataInProcessUpdate}
+          blockingSiteControl={this.props.blockingSiteControl}
         />
       </>
     );
@@ -80,13 +94,15 @@ class DistributorContainer extends React.Component {
 
 const mapStateToProps = (state) => {
   return {
-    quantityNFT: getAllQuantityNFT(state),
-    generalDataNFT: getAllNFT(state),
     recipient: getRecipient(state),
-    responseTransaction: getResponseTransaction(state),
-    dataUpdateDone: getDataUpdateDone(state),
+    generalDataNFT: getAllNFT(state),
     errorMessage: getErrorMessage(state),
+    quantityNFT: getAllQuantityNFT(state),
+    dataUpdateDone: getDataUpdateDone(state),
+    disadvantagedUsers: getDisadvantagedUsers(state),
+    responseTransaction: getResponseTransaction(state),
     dataInProcessUpdate: getDataInProcessUpdate(state),
+    blockingSiteControl: getBlockingSiteControl(state),
   };
 };
 
